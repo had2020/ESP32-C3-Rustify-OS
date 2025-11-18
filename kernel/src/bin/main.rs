@@ -6,14 +6,19 @@
     holding buffers for the duration of a data transfer."
 )]
 
+use core::u16;
+
+use alloc::fmt::format;
+use alloc::string;
 use esp_alloc::HeapStats;
 use esp_backtrace as _;
 use esp_hal::clock::CpuClock;
 use esp_hal::main;
 use esp_hal::time::{Duration, Instant};
 use esp_hal::timer::timg::TimerGroup;
-use esp_radio::wifi::{AccessPointConfig, ModeConfig, WifiMode};
+use esp_radio::wifi::{AccessPointConfig, AuthMethod, ModeConfig, WifiMode};
 //use esp_radio::ble::controller::BleConnector;
+use crate::alloc::string::ToString;
 use log::info;
 
 extern crate alloc;
@@ -46,9 +51,15 @@ fn main() -> ! {
         esp_radio::wifi::new(&radio_init, peripherals.WIFI, Default::default())
             .expect("Failed to initialize Wi-Fi controller");
     //let _connector = BleConnector::new(&radio_init, peripherals.BT, Default::default());
-    _wifi_controller.set_config(&ModeConfig::AccessPoint(AccessPointConfig::with_ssid(
-        stringify!("SSH_ESP32-3C"),
-    )));
+
+    let access_point_config = AccessPointConfig::default()
+        .with_ssid("SH_ESP32-3C".to_string())
+        .with_channel(1)
+        .with_secondary_channel(2)
+        .with_auth_method(AuthMethod::Wpa3Personal)
+        .with_password("P2K67".to_string());
+
+    _wifi_controller.set_config(&ModeConfig::AccessPoint(access_point_config));
 
     _wifi_controller
         .set_mode(esp_radio::wifi::WifiMode::Ap)
