@@ -53,11 +53,11 @@ fn main() -> ! {
     //let _connector = BleConnector::new(&radio_init, peripherals.BT, Default::default());
 
     let access_point_config = AccessPointConfig::default()
-        .with_ssid("SH_ESP32-3C".to_string())
-        .with_channel(1)
-        .with_secondary_channel(2)
-        .with_auth_method(AuthMethod::Wpa3Personal)
-        .with_password("P2K67".to_string());
+        .with_ssid("SSH_ESP32-3C-RS-OS".to_string())
+        .with_channel(10)
+        .with_secondary_channel(0)
+        .with_auth_method(AuthMethod::Wpa2Wpa3Personal)
+        .with_password("RustIsFun".to_string());
 
     _wifi_controller
         .set_config(&ModeConfig::AccessPoint(access_point_config))
@@ -67,8 +67,11 @@ fn main() -> ! {
         .set_mode(esp_radio::wifi::WifiMode::Ap)
         .unwrap();
 
-    _wifi_controller.start();
-    info!("{}", _wifi_controller.is_started().unwrap());
+    let _ = _wifi_controller.start().unwrap();
+    info!(
+        "Acess Point Online: {}",
+        _wifi_controller.is_started().unwrap()
+    );
 
     loop {
         let stats: HeapStats = esp_alloc::HEAP.stats();
